@@ -1,0 +1,89 @@
+#! /c/iverilog/bin/vvp
+:ivl_version "0.9.7 " "(v0_9_7)";
+:vpi_time_precision + 0;
+:vpi_module "system";
+:vpi_module "v2005_math";
+:vpi_module "va_math";
+S_012A79A8 .scope module, "reg_file" "reg_file" 2 19;
+ .timescale 0 0;
+P_012A50C4 .param/l "ADDRESS_WIDTH" 2 22, +C4<00000000000000000000000000000010>;
+P_012A50D8 .param/l "DATA_WIDTH" 2 21, +C4<0100100>;
+P_012A50EC .param/l "NUM_REGS" 2 20, +C4<0100>;
+v012A1C80_0 .var/i "i", 31 0;
+v012A1CD8_0 .net "i_clk", 0 0, C4<z>; 0 drivers
+v012A1D30_0 .net "i_rd", 1 0, C4<zz>; 0 drivers
+v012A1D88_0 .net "i_rs1", 1 0, C4<zz>; 0 drivers
+v012AE6E8_0 .net "i_rs2", 1 0, C4<zz>; 0 drivers
+v012AE740_0 .net "i_rst", 0 0, C4<z>; 0 drivers
+v012AE798_0 .net "i_wdata", 35 0, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; 0 drivers
+v012AE7F0_0 .net "i_wen", 0 0, C4<z>; 0 drivers
+v012AE848_0 .var "o_rs1_data", 35 0;
+v012AE8A0_0 .var "o_rs2_data", 35 0;
+v012AE8F8 .array "r_regs", 3 0, 35 0;
+E_01142530 .event posedge, v012A1CD8_0;
+v012AE8F8_0 .array/port v012AE8F8, 0;
+v012AE8F8_1 .array/port v012AE8F8, 1;
+v012AE8F8_2 .array/port v012AE8F8, 2;
+E_012A4F08/0 .event edge, v012A1D88_0, v012AE8F8_0, v012AE8F8_1, v012AE8F8_2;
+v012AE8F8_3 .array/port v012AE8F8, 3;
+E_012A4F08/1 .event edge, v012AE8F8_3, v012AE6E8_0;
+E_012A4F08 .event/or E_012A4F08/0, E_012A4F08/1;
+    .scope S_012A79A8;
+T_0 ;
+    %wait E_012A4F08;
+    %ix/getv 3, v012A1D88_0;
+    %load/av 8, v012AE8F8, 36;
+    %ix/load 0, 36, 0;
+    %assign/v0 v012AE848_0, 0, 8;
+    %ix/getv 3, v012AE6E8_0;
+    %load/av 8, v012AE8F8, 36;
+    %ix/load 0, 36, 0;
+    %assign/v0 v012AE8A0_0, 0, 8;
+    %jmp T_0;
+    .thread T_0, $push;
+    .scope S_012A79A8;
+T_1 ;
+    %set/v v012A1C80_0, 0, 32;
+    %end;
+    .thread T_1;
+    .scope S_012A79A8;
+T_2 ;
+    %wait E_01142530;
+    %load/v 8, v012AE740_0, 1;
+    %jmp/0xz  T_2.0, 8;
+    %set/v v012A1C80_0, 0, 32;
+T_2.2 ;
+    %load/v 8, v012A1C80_0, 32;
+   %cmpi/s 8, 4, 32;
+    %jmp/0xz T_2.3, 5;
+    %ix/getv/s 3, v012A1C80_0;
+    %jmp/1 t_0, 4;
+    %ix/load 0, 36, 0; word width
+    %ix/load 1, 0, 0; part off
+    %assign/av v012AE8F8, 0, 0;
+t_0 ;
+    %ix/load 0, 1, 0;
+    %load/vp0/s 8, v012A1C80_0, 32;
+    %set/v v012A1C80_0, 8, 32;
+    %jmp T_2.2;
+T_2.3 ;
+    %jmp T_2.1;
+T_2.0 ;
+    %load/v 8, v012AE7F0_0, 1;
+    %jmp/0xz  T_2.4, 8;
+    %load/v 8, v012AE798_0, 36;
+    %ix/getv 3, v012A1D30_0;
+    %jmp/1 t_1, 4;
+    %ix/load 0, 36, 0; word width
+    %ix/load 1, 0, 0; part off
+    %assign/av v012AE8F8, 0, 8;
+t_1 ;
+T_2.4 ;
+T_2.1 ;
+    %jmp T_2;
+    .thread T_2;
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "reg_file.v";
