@@ -1,15 +1,19 @@
 
 `timescale 1ns/ 1ps
-`include "../src/ALU.v"
+`include "../src/alu.v"
 
-module ALU_tb (); 
 
-    reg [35:0] i_a; 
-    reg [35:0] i_b; 
-    reg [1:0]  i_ALUControlS;
-    wire [35:0] o_ALU_Result; 
+module alu_tb (); 
+
+    localparam DATA_WIDTH = 36; 
+    localparam ALU_OP_WIDTH = 3;
+
+    reg [DATA_WIDTH-1:0] i_a; 
+    reg [DATA_WIDTH-1:0] i_b; 
+    reg [ALU_OP_WIDTH-1:0]  i_ALUControlS;
+    wire [DATA_WIDTH-1:0] o_ALU_Result; 
     
-    ALU dut(
+    alu dut(
         .i_a(i_a),
         .i_b(i_b),
         .i_ALUControlS(i_ALUControlS),

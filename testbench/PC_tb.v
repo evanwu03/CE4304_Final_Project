@@ -2,7 +2,7 @@
 `timescale 1ns/ 1ps
 `include "../src/PC.v"
 
-module PC_tb(); 
+module pc_tb(); 
 
     parameter c_CLOCK_PERIOD_NS = 100;
 
@@ -10,7 +10,7 @@ module PC_tb();
     reg r_clk = 0;
     wire [35:0] pc_out; 
     
-    PC dut(
+    pc dut(
         .i_rst(r_rst),
         .i_clk(r_clk),
         .o_pc(pc_out) 
