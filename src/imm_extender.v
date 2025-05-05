@@ -37,18 +37,18 @@ always @(*)
         case (i_immSel) 
             // R type instructions don't need to use immediate 
             `IMMSEL_NONE: begin
-                o_imm_ext = {DATA_WIDTH{1'b0}}
+                o_imm_ext = {DATA_WIDTH{1'b0}};
 
             end
 
             // I type instructions 8 bit immediate field
             `IMMSEL_I_TYPE: begin
-                o_imm_ext = {{(DATA_WIDTH-8){i_immRaw[I_IMM_WIDTH-1]}}, i_immRaw[I_IMM_WIDTH-1:0]}; 
+                o_imm_ext = {{(DATA_WIDTH-I_IMM_WIDTH){i_immRaw[I_IMM_WIDTH-1]}}, i_immRaw[I_IMM_WIDTH-1:0]}; 
             end 
 
             // J type instructions 14 bit immediate field
             `IMMSEL_J_TYPE: begin
-                o_imm_ext = {{(DATA_WIDTH-14){i_immRaw[J_IMM_WIDTH-1]}}, i_immRaw[J_IMM_WIDTH-1:0]};              
+                o_imm_ext = {{(DATA_WIDTH-J_IMM_WIDTH){i_immRaw[J_IMM_WIDTH-1]}}, i_immRaw[J_IMM_WIDTH-1:0]};              
 
             end 
 
@@ -59,6 +59,4 @@ always @(*)
 
         endcase 
     end
-
-
 endmodule
