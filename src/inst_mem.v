@@ -42,7 +42,7 @@ module inst_mem #(
     output reg [DATA_WIDTH-1:0] o_data
 );
     
-    // Defines Instruction 8kb memory array 
+    // Defines Instruction 16kb memory array 
     reg [DATA_WIDTH-1:0] memory [0:INSTRUCTION_MEM_SIZE-1]; 
 
     // Fetches an instruction from memory every clock cycle

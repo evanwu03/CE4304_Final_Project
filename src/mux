@@ -1,0 +1,19 @@
+#! /c/iverilog/bin/vvp
+:ivl_version "0.9.7 " "(v0_9_7)";
+:vpi_time_precision + 0;
+:vpi_module "system";
+:vpi_module "v2005_math";
+:vpi_module "va_math";
+S_01221C80 .scope module, "mux2" "mux2" 2 5;
+ .timescale 0 0;
+P_0122496C .param/l "DATA_WIDTH" 2 6, +C4<0100100>;
+v01221D08_0 .net "i_a", 35 0, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; 0 drivers
+v01221D60_0 .net "i_b", 35 0, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; 0 drivers
+v012245A0_0 .net "i_sel", 0 0, C4<z>; 0 drivers
+v012245F8_0 .net "o_out", 35 0, L_01224650; 1 drivers
+L_01224650 .functor MUXZ 36, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>, C4<z>, C4<>;
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "mux.v";

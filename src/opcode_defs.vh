@@ -13,7 +13,8 @@
 
 // Function Opcodes
 `define FUNCT_ADD 8'h00
-`define FUNCT_SUB 8'h02
+`define FUNCT_SUB 8'h01
+`define FUNCT_SUBS 8'h02
 `define FUNCT_AND 8'h03
 `define FUNCT_OR  8'h04
 
