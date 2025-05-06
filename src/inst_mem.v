@@ -14,7 +14,8 @@
 module inst_mem #(
     parameter INSTRUCTION_MEM_SIZE = 8192,
     parameter INSTRUCTION_WIDTH    = 18,
-    parameter INSTRUCTION_ADDR_WIDTH = $clog2(INSTRUCTION_MEM_SIZE)
+    parameter INSTRUCTION_ADDR_WIDTH = $clog2(INSTRUCTION_MEM_SIZE)+1,
+    parameter MEM_BASE_ADDR = 14'h2000 // Programs are loaded 0x2000
 ) (
     input i_clk,
     input [INSTRUCTION_ADDR_WIDTH-1:0] i_address,
@@ -27,7 +28,12 @@ module inst_mem #(
     // Fetches an instruction from memory every clock cycle
     always @(posedge i_clk) 
         begin
-            instruction <= memory[i_address];
+            if (i_address >= MEM_BASE_ADDR) begin
+                instruction <= memory[i_address-MEM_BASE_ADDR];
+            end
+            else if (i_address <= MEM_BASE_ADDR) begin
+                instruction <= {INSTRUCTION_WIDTH{1'b0}}; // NOP or invalid
+            end
         end
 endmodule
 

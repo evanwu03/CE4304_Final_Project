@@ -32,9 +32,11 @@ module inst_decode #(
     parameter ADDRESS_WIDTH = 2, 
     parameter OPCODE_WIDTH = 4,
     parameter IMM_SEL_WIDTH = 2,
-    parameter ALU_OP_WIDTH = 3
+    parameter ALU_OP_WIDTH = 3,
+    parameter FUNCTION_WIDTH = 8
 ) (
-    input [OPCODE_WIDTH-1:0]  i_opcode,
+    input [OPCODE_WIDTH-1:0]    i_opcode,
+    input [FUNCTION_WIDTH-1:0]  i_funct,
     //input [ADDRESS_WIDTH-1:0] i_rd,  WILL BE IMPLEMENTED IN PIPELINE LATER
     
     output reg o_pc_src,
@@ -71,49 +73,46 @@ always @(*)
     begin 
 
         set_defaults(); 
-
-        // Determine if register writeback is required
-        case(i_opcode) 
-
-        `ADD, `SUB, `AND, `OR, `ADDI, `SUBI, `LDR: 
-            o_regWrite = 1;
-        
-        endcase 
-
-        // Determine ALU_OP 
-        case(i_opcode)
-            `ADD, `ADDI, `LDR, `STR, `JMP: begin 
-                o_alu_op = `ALU_ADD;
-            end
-
-            `SUB, `SUBI, `BNE: begin
-                o_alu_op = `ALU_SUB;
-            end            
-
-            `OR: begin
-                o_alu_op = `ALU_OR;
-            end         
-
-            `AND: begin
-                o_alu_op = `ALU_AND;
-            end     
-
-            default: begin
-                o_alu_op = `ALU_ADD;    
-            end                   
-        endcase 
-
-
+    
         // I-Type instructions
         case(i_opcode)
 
+        `R_TYPE: begin
+            o_regWrite = 1; 
+
+            case(i_funct) 
+                `FUNCT_ADD: begin
+                    o_alu_op = `ALU_ADD;
+                end
+
+                `FUNCT_SUB: begin
+                    o_alu_op = `ALU_SUB;
+                end
+
+                `FUNCT_AND: begin
+                    o_alu_op = `ALU_AND; 
+                end
+
+                `FUNCT_OR: begin
+                    o_alu_op = `ALU_OR;
+                end
+                
+                // Default to ADD to ensure safe fallback
+                default: begin
+                    o_alu_op = `ALU_ADD;
+                end
+            endcase
+        end
+
         // Load operation 
         `LDR: begin
+            o_regWrite = 1;
             o_memToReg = 1;
             o_memRead  = 1;
             o_alu_src  = 1;
             o_regSrc   = 1;
             o_immSel   = `IMMSEL_I_TYPE;
+            o_alu_op   = `ALU_ADD;
         end
 
         // Store operation
@@ -122,30 +121,41 @@ always @(*)
             o_alu_src    = 1;
             o_regSrc     = 1;
             o_immSel     = `IMMSEL_I_TYPE;
+            o_alu_op   = `ALU_ADD;
         end
 
         // I-type ALU instructions
-        `ADDI, `SUBI: begin
+        `ADDI: begin
+            o_regWrite = 1;
             o_alu_src = 1;
             o_regSrc  = 1;
             o_immSel  = `IMMSEL_I_TYPE;
+            o_alu_op   = `ALU_ADD;
+        end
+
+        `SUBI: begin
+            o_regWrite = 1;
+            o_alu_src = 1;
+            o_regSrc  = 1;
+            o_immSel  = `IMMSEL_I_TYPE;
+            o_alu_op  = `ALU_SUB; 
+        end
+
+         // Conditional branch
+        `BNE: begin
+            o_branch  = 1;
+            o_immSel  = `IMMSEL_J_TYPE;
+            o_alu_op   = `ALU_SUB;
+        end
+
+        // Unconditional Jump
+         `JMP: begin
+            o_pc_src  = 1;
+            o_immSel  = `IMMSEL_J_TYPE;
+            o_alu_op   = `ALU_ADD;
         end
 
         endcase
 
-       // J-Type instructions
-        case (i_opcode)
-
-             // Conditional branch
-            `BNE: begin
-                o_branch  = 1;
-                o_immSel  = `IMMSEL_J_TYPE;
-            end
-
-             `JMP: begin
-                o_pc_src  = 1;
-                o_immSel  = `IMMSEL_J_TYPE;
-            end
-        endcase
     end
 endmodule

@@ -6,11 +6,17 @@
 // Definition of R, I, and J type instruction opcodes 
 
 
+
+
 // R-type Opcodes 
-`define ADD 4'b0000
-`define SUB 4'b0001
-`define AND 4'b0010
-`define OR  4'b0011
+`define R_TYPE 4'b0000
+
+// Function Opcodes
+`define FUNCT_ADD 8'h00
+`define FUNCT_SUB 8'h02
+`define FUNCT_AND 8'h03
+`define FUNCT_OR  8'h04
+
 
 // I-type Opcodes 
 `define LDR  4'b0100

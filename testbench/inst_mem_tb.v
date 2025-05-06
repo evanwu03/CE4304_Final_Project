@@ -8,7 +8,7 @@ module inst_mem_tb;
     // Parameters
     localparam INSTRUCTION_MEM_SIZE    = 8192;
     localparam INSTRUCTION_WIDTH       = 18;
-    localparam INSTRUCTION_ADDR_WIDTH  = $clog2(INSTRUCTION_MEM_SIZE);
+    localparam INSTRUCTION_ADDR_WIDTH  = $clog2(INSTRUCTION_MEM_SIZE)+1;
     parameter c_CLOCK_PERIOD_NS        = 100;
 
     // Inputs
@@ -42,27 +42,32 @@ module inst_mem_tb;
     initial begin
         // Initialize signals
         r_clk = 0;
-        i_address = 0;
+        i_address = 14'h2000;
 
         // Preload memory (optional: create `program.hex` file with 18-bit hex values)
         $readmemh("program.hex", uut.memory);
 
-        // Wait and then test a few addresses
-        i_address <= 0;
+        // Wait and then test a few addresses        
         @(posedge r_clk)
-        i_address <= 1;
+        i_address <= 14'h2000;
         @(posedge r_clk)
-        i_address <= 2;
+        i_address <= 14'h2001;
         @(posedge r_clk)
-        i_address <= 3;
+        i_address <= 14'h2002;
         @(posedge r_clk)
-        i_address <= 4;
+        i_address <= 14'h2003;
         @(posedge r_clk)
-        i_address <= 5;
+        i_address <= 14'h2004;
         @(posedge r_clk)
-        i_address <= 100;
+        i_address <= 14'h2005;
         @(posedge r_clk)
-        i_address <= 8191; // Edge of memory
+        i_address <= 14'h2006;
+        @(posedge r_clk)
+        i_address <= 14'h2007; 
+        @(posedge r_clk)
+        i_address <= 14'h2008;
+        @(posedge r_clk)
+        i_address <= 14'h2009;
         @(posedge r_clk)
         $finish;
     end
