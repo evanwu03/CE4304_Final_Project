@@ -89,7 +89,7 @@ always @(*)
                     o_alu_op = `ALU_SUB;
                 end
 
-                `FUNCT_SUB: begin
+                `FUNCT_SUBS: begin
                     o_alu_op = `ALU_SUBS;
                 end
 

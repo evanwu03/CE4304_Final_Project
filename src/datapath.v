@@ -37,6 +37,8 @@ module cpu #(
     parameter INSTRUCTION_WIDTH = 18,
     parameter DATA_WIDTH = 36, 
     parameter NUM_REGS = 4, 
+    parameter OPCODE_WIDTH = 4,
+    parameter IMM_MAX_WIDTH = 14,
     parameter ADDRESS_WIDTH = $clog2(NUM_REGS)
 )
 (
@@ -45,13 +47,21 @@ module cpu #(
 );
     
 
-// Instruction fetch 
+// Instruction bitfields 
 wire [INSTRUCTION_WIDTH-1:0] w_instruction;
+wire [OPCODE_WIDTH-1:0]  w_opcode = w_instruction[17:14];
+wire [ADDRESS_WIDTH-1:0] w_rd  = w_instruction[13:12];
+wire [ADDRESS_WIDTH-1:0] w_rs1 = w_instruction[11:10];
+wire [ADDRESS_WIDTH-1:0] w_rs2 = w_instruction[9:8];
+wire [13:0] w_imm14 = w_instruction[13:0];
+wire [7:0]  w_funct = w_instruction [7:0];
 
-// Register file interface
-wire [ADDRESS_WIDTH-1:0] w_rs1, w_rs2, w_rd;
+
+// Data memory read port 
+wire [DATA_WIDTH-1:0] w_data_mem;
+
+// Register file read/write ports
 wire [DATA_WIDTH-1:0]  w_rs2_data, w_rs1_data,  w_wdata;
-
 
 // ALU interface 
 wire [DATA_WIDTH-1:0] w_alu_a, w_alu_b, w_alu_out;
@@ -72,26 +82,69 @@ wire w_pc_srcD, w_memToRegD, w_memWriteD, w_memReadD,
 wire w_condExeD; 
 
 
+
+// Instruction/Data Memory 
+inst_mem memory(
+    .i_clk(i_clk), 
+    .i_writeEnable(w_regWriteEnableD), 
+    .i_dataReadEnable(w_memToRegD), 
+    .i_wdata(w_rs2_data),
+    .i_address(w_pc_val),
+    .o_instruction(w_instruction),
+    .o_data(w_data_mem);
+);
+
+
 // second operand src register mux controlled by w_reg_srcD
+wire [ADDRESS_WIDTH-1:0] w_rs2_addr; 
+
 mux2 rs2_sel #(.DATA_WIDTH = 2) ( 
-    .i_a(w_instruction[]),
-    .i_b(),
-    .i_sel(w_reg_srcD)
+    .i_a(w_rs2),
+    .i_b(2'b00), // Dummy register, contents won't be used by ALU
+    .i_sel(w_reg_srcD),
+    .o_out(w_rs2_addr)
 ); 
 
-
 // Register file
-reg_file reg_file();
+reg_file reg_file(
+    .i_clk(i_clk),
+    .i_rst(i_rst),
+    .i_rs1(w_rs1),
+    .i_rs2(w_rs2_addr),
+    .i_rd(w_rd),
+    .i_wdata(w_wdata),
+    .i_wen(w_regWriteEnableD),
+    .o_rs1_data(w_rs1_data),
+    .o_rs2_data(w_rs2_data)
+);
+
+// Immediate extender 
+imm_extender imm_extender(
+    .i_immRaw(w_imm14),
+    .i_immSel(w_immSelD),
+    .o_imm_ext(w_imm_ext)
+);
+
+
+// ALU source mux
+wire [DATA_WIDTH-1:0] = w_srcBE;
+mux2 alu_sel #(.DATA_WIDTH = 2) (
+    .i_a(w_rs2_data),
+    .i_b(w_imm_ext),
+    .i_sel(w_alu_srcD);
+    .o_out(w_srcBE)
+);
+
+
 // ALU module 
 alu alu();
 // Instruction decoder 
 inst_decode inst_decoder();
-// Instruction/Data Memory 
-inst_mem memory();
 // Branch Unit 
 branch_unit branch_unit();
 // Program Counter 
 pc pc();
 // Muxes for Register file, Program counter, and WB stage
+
 
 endmodule
