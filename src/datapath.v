@@ -39,6 +39,7 @@ module cpu #(
     parameter NUM_REGS = 4, 
     parameter OPCODE_WIDTH = 4,
     parameter IMM_MAX_WIDTH = 14,
+    parameter PC_WIDTH = 14,
     parameter ADDRESS_WIDTH = $clog2(NUM_REGS)
 )
 (
@@ -61,23 +62,26 @@ wire [7:0]  w_funct = w_instruction [7:0];
 wire [DATA_WIDTH-1:0] w_data_mem;
 
 // Register file read/write ports
-wire [DATA_WIDTH-1:0]  w_rs2_data, w_rs1_data,  w_regWritedata;
+wire [DATA_WIDTH-1:0]  w_rs2_data, w_rs1_data,  w_regWriteData;
 
 // ALU interface 
 wire [DATA_WIDTH-1:0] w_srcAE = w_rs1_data; // For now rs1 read port will be directly tied to ALU A operand
-wire [DATA_WIDTH-1:0], w_srcBE, w_alu_outE;
+wire [DATA_WIDTH-1:0] w_srcBE, w_alu_outE;
 wire w_alu_zero, w_alu_negative;
 
 // Immediate extender inteface
 wire [DATA_WIDTH-1:0] w_imm_ext;
 
 // PC interface 
-wire [INSTRUCTION_WIDTH-1:0] w_next_pc, w_pc_val;
+wire [PC_WIDTH-1:0] w_next_pc, w_pc_val;
 
 // Instruction Decoder interface 
 wire w_pc_srcD, w_memToRegD, w_memWriteD, w_memReadD,
-     w_regWriteEnableD, w_alu_srcD, w_reg_srcD, w_alu_opD, w_immSelD,
+     w_regWriteEnableD, w_alu_srcD, w_reg_srcD,
      w_branchD ;
+
+wire [2:0] w_alu_opD;
+wire [1:0] w_immSelD;
 
 // Branch Unit interface 
 wire w_condExeE; 
@@ -100,14 +104,14 @@ inst_mem memory(
     .i_wdata(w_rs2_data),
     .i_address(w_pc_val),
     .o_instruction(w_instruction),
-    .o_data(w_data_mem);
+    .o_data(w_data_mem)
 );
 
 
 // second operand src register mux controlled by w_reg_srcD
 wire [ADDRESS_WIDTH-1:0] w_rs2_addr; 
 
-mux2 rs2_sel #(.DATA_WIDTH = 2) ( 
+mux2 #(ADDRESS_WIDTH) rs2_sel ( 
     .i_a(w_rs2),
     .i_b(2'b00), // Dummy register, contents won't be used by ALU
     .i_sel(w_reg_srcD),
@@ -121,7 +125,7 @@ reg_file reg_file(
     .i_rs1(w_rs1),
     .i_rs2(w_rs2_addr),
     .i_rd(w_rd),
-    .i_wdata(w_wdata),
+    .i_wdata(w_regWriteData),
     .i_wen(w_regWriteEnableD),
     .o_rs1_data(w_rs1_data),
     .o_rs2_data(w_rs2_data)
@@ -136,12 +140,10 @@ imm_extender imm_extender(
 
 
 // ALU source mux
-wire [DATA_WIDTH-1:0] = w_srcBE;
-
-mux2 alu_sel #(.DATA_WIDTH = DATA_WIDTH) (
+mux2 #(DATA_WIDTH) alu_sel (
     .i_a(w_rs2_data),
     .i_b(w_imm_ext),
-    .i_sel(w_alu_srcD);
+    .i_sel(w_alu_srcD),
     .o_out(w_srcBE)
 );
 
@@ -175,14 +177,6 @@ alu alu(
     .o_ALU_Result(w_alu_outE)
 );
 
-/*
-    input [OPCODE_WIDTH-1:0] i_opcode,
-    input                    i_zero,
-    input                    i_negative,
-    //input                  i_carry, 
-    //input                  i_v
-    output reg               o_condition_met
-*/
 
 // Branch Unit 
 branch_unit branch_unit(
@@ -196,28 +190,28 @@ branch_unit branch_unit(
 
 
 // assign branchD & condExeE to pc_srcM
-wire w_branchE = w_branchD // Just to keep stage name convention consistent
+wire w_branchE = w_branchD; // Just to keep stage name convention consistent
 wire w_pc_srcE = w_pc_srcD;
 wire pc_srcM = w_pc_srcE & w_condExeE;
 wire w_branchTakenE = w_branchE & w_condExeE;
 
 
 // Muxes for WB - writeback stage
-mux2 regWB_sel #(.DATA_WIDTH = 36) ( 
+mux2  #(DATA_WIDTH) regWB_sel ( 
     .i_a(w_alu_outE),
     .i_b(w_data_mem),
     .i_sel(w_memToRegD),
-    .o_out(w_regWritedata_wdata)
+    .o_out(w_regWriteData)
 );
 
+
 // Selects new PC value 
-wire pc_plus1 = w_pc_val + 1'b1; // Go to next instruction (word-based)
-mux2 pc_sel #(.DATA_WIDTH = 14) (
+wire [PC_WIDTH-1:0] pc_plus1 = w_pc_val + 1'b1; // Go to next instruction (word-based)
+mux2  #(PC_WIDTH) pc_sel (
     .i_a(pc_plus1),
-    .i_b(w_alu_outE),
+    .i_b(w_alu_outE[13:0]),
     .i_sel(w_branchTakenE),
     .o_out(w_next_pc)
-)
-
+);
 
 endmodule

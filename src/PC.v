@@ -12,7 +12,7 @@ module pc#(
 )(
     input i_rst,
     input i_clk, 
-    input i_pc_in,
+    input [WIDTH-1:0] i_pc_in,
     output reg [WIDTH-1:0] o_pc_out
 );
 
