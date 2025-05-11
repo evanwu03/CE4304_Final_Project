@@ -21,9 +21,6 @@
 // W - Writeback 
 
 
-// NOTE: For now this is a single cycle design. Plans are made 
-// add to a 5 stage pipeline design.
-
 `include "alu.v"
 `include "reg_file.v"
 `include "imm_extender.v"
@@ -40,17 +37,25 @@ module cpu #(
     parameter OPCODE_WIDTH = 4,
     parameter IMM_MAX_WIDTH = 14,
     parameter PC_WIDTH = 14,
+    parameter ADDRESS_BUS_WIDTH = 14,
     parameter ADDRESS_WIDTH = $clog2(NUM_REGS)
 )
 (
     input i_clk,
     input i_rst,
-    output reg o_dummy
+    input  [INSTRUCTION_WIDTH-1:0] i_instruction,
+    input  [DATA_WIDTH-1:0]        i_data_mem,
+    output [DATA_WIDTH-1:0]        o_data_write,
+    output [ADDRESS_BUS_WIDTH-1:0]        o_instr_addr,
+    output [ADDRESS_BUS_WIDTH-1:0]        o_data_addr,
+    output                         o_mem_write,
+    output                         o_mem_read
 );
     
 
+
 // Instruction bitfields 
-wire [INSTRUCTION_WIDTH-1:0] w_instruction;
+wire [INSTRUCTION_WIDTH-1:0] w_instruction = i_instruction;
 wire [OPCODE_WIDTH-1:0]  w_opcode = w_instruction[17:14];
 wire [ADDRESS_WIDTH-1:0] w_rd  = w_instruction[13:12];
 wire [ADDRESS_WIDTH-1:0] w_rs1 = w_instruction[11:10];
@@ -60,7 +65,7 @@ wire [7:0]  w_funct = w_instruction [7:0];
 
 
 // Data memory read port 
-wire [DATA_WIDTH-1:0] w_data_mem;
+wire [DATA_WIDTH-1:0] w_data_mem = i_data_mem;
 
 // Register file read/write ports
 wire [DATA_WIDTH-1:0]  w_rs2_data, w_rs1_data,  w_regWriteData;
@@ -88,6 +93,13 @@ wire [1:0] w_immSelD;
 wire w_condExeE; 
 
 
+// Assign all ouputs
+assign o_data_write = w_rs2_data;
+assign o_instr_addr = w_pc_val;
+assign o_data_addr  = w_alu_outE[13:0];
+assign o_mem_write = w_memWriteD;
+assign o_mem_read = w_memReadD;
+
 // Program Counter 
 pc pc(
     .i_clk(i_clk),
@@ -95,37 +107,6 @@ pc pc(
     .i_pc_in(w_next_pc),
     .o_pc_out(w_pc_val)
 );
-
-
-
-
-// Instruction/Data Memory 
-inst_mem memory(
-    .i_clk(i_clk), 
-    .i_writeEnable(w_memWriteD), 
-    .i_dataReadEnable(w_memReadD), 
-    .i_wdata(w_rs2_data),
-    .i_instr_address(w_pc_val),
-    .i_data_address(w_alu_outE[13:0]),
-    .o_instruction(w_instruction),
-    .o_data(w_data_mem)
-);
-
-// Load program 
-initial begin
-    // Preload memory (optional: create `program.hex` file with 18-bit hex values)
-        $display("Trying to load program");
-        $readmemb("test2.mem", memory.memory);
-end
-
-
-integer i; 
-initial begin
-    for (i = 0; i < 10; i = i +1) begin
-        $display("Loaded memory with: %b", memory.memory[14'h2000+i]);
-    end
-end
-
 
 
 // second operand src register mux controlled by w_reg_srcD
