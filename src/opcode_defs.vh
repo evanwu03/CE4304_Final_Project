@@ -6,7 +6,26 @@
 // Definition of R, I, and J type instruction opcodes 
 
 
+/* R-TYPE INSTRUCTION FORMAT
+//[17:14] -> opcode  
+//[13:12] -> rd  
+//[11:10] -> rs1  
+//[9:8]   -> rs2  
+//[7:0]   -> funct (R-type)
+//[13:0]  -> immediate (I-type / J-type)
 
+
+/* I-TYPE INSTRUCTION FORMAT */
+//[17:14] -> opcode  
+//[13:12] -> rd  
+//[11:10] -> rs1  
+//[9:8]   -> rs2  
+//[7:0]   -> immediate 
+
+
+/* J-TYPE INSTRUCTION FORMAT */
+//[17:14] -> opcode 
+//[13:0]  -> immediate
 
 // R-type Opcodes 
 `define R_TYPE 4'b0000
@@ -24,10 +43,9 @@
 `define STR  4'b0101
 `define ADDI 4'b0110
 `define SUBI 4'b0111
-
+`define BNE 4'b1000
 // J-type Opcodes
-`define JMP 4'b1000
-`define BNE 4'b1001
+`define JMP 4'b1001
 
 // Immediate Select Type 
 `define IMMSEL_NONE 2'b00   // No extension (R type)

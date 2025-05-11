@@ -37,7 +37,8 @@ module inst_mem #(
     input i_writeEnable,
     input i_dataReadEnable,
     input [DATA_WIDTH-1:0] i_wdata, 
-    input [ADDRESS_BUS_WIDTH-1:0] i_address,
+    input [ADDRESS_BUS_WIDTH-1:0] i_instr_address,
+    input [ADDRESS_BUS_WIDTH-1:0] i_data_address,
     output reg [INSTRUCTION_WIDTH-1:0] o_instruction,
     output reg [DATA_WIDTH-1:0] o_data
 );
@@ -45,23 +46,19 @@ module inst_mem #(
     // Defines Instruction 16kb memory array 
     reg [DATA_WIDTH-1:0] memory [0:INSTRUCTION_MEM_SIZE-1]; 
 
-    // Fetches an instruction from memory every clock cycle
-    always @(posedge i_clk) 
-        begin
-
-            // Write to data memory 
-            if (i_writeEnable && (i_address < MEM_BASE_ADDR) && (i_address >= 0)) begin
-                memory[i_address] <= i_wdata;
+    always @(*) begin
+             // Read Data memory 
+            if (i_dataReadEnable && (i_data_address < MEM_BASE_ADDR) ) begin
+                o_data <= memory[i_data_address];
             end
-
-            // Read Data memory 
-            else if (i_dataReadEnable && (i_address < MEM_BASE_ADDR) ) begin
-                o_data <= memory[i_address];
+            else begin
+                o_data <= 36'b0;
             end
+      
 
             // Instruction Fetch
-            else if (i_address >= MEM_BASE_ADDR) begin
-                o_instruction <= memory[i_address-MEM_BASE_ADDR][INSTRUCTION_WIDTH-1:0];
+            if (i_instr_address >= MEM_BASE_ADDR) begin
+                o_instruction <= memory[i_instr_address][INSTRUCTION_WIDTH-1:0];
             end
 
             // Out of Range/Invalid execute NOP
@@ -69,6 +66,21 @@ module inst_mem #(
                  o_instruction <= {INSTRUCTION_WIDTH{1'b0}}; // NOP or invalid 
                  o_data <= {DATA_WIDTH{1'b0}};
             end
+    end
+    // Fetches an instruction from memory every clock cycle
+    always @(posedge i_clk) 
+        begin
+
+            // Write to data memory 
+            if (i_writeEnable && (i_data_address < MEM_BASE_ADDR) && (i_data_address >= 0)) begin
+                memory[i_data_address] <= i_wdata;
+                // Print output to console
+                $display("Wrote %d to 0x%h", i_wdata, i_data_address);
+            end
+
+
         end
+
+
 endmodule
 

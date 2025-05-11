@@ -21,7 +21,7 @@ begin
     
     if (i_rst) 
         begin
-            o_pc_out <= 0; 
+            o_pc_out <= 14'h2000; 
         end
     else
         begin

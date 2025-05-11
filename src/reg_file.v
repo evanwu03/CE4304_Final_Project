@@ -44,7 +44,6 @@ always @(*)
         o_rs2_data <= r_regs[i_rs2];
     end
 
-
 integer i = 0; 
 // Synchronous Write
 always @(posedge i_clk) 
@@ -59,6 +58,7 @@ always @(posedge i_clk)
         else if (i_wen) // if write is enabled, write data to destination register.
             begin
                 r_regs[i_rd] <= i_wdata; 
+                $display("Wrote %d to R%d", i_wdata, i_rd);
             end
     end
 endmodule

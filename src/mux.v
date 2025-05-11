@@ -11,6 +11,6 @@ module mux2 #(
     output [DATA_WIDTH-1:0] o_out
 );
 
-assign o_out = i_sel ? i_a : i_b;
+assign o_out = i_sel ? i_b : i_a;
 
 endmodule

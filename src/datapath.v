@@ -44,7 +44,8 @@ module cpu #(
 )
 (
     input i_clk,
-    input i_rst
+    input i_rst,
+    output reg o_dummy
 );
     
 
@@ -96,34 +97,55 @@ pc pc(
 );
 
 
+
+
 // Instruction/Data Memory 
 inst_mem memory(
     .i_clk(i_clk), 
     .i_writeEnable(w_memWriteD), 
     .i_dataReadEnable(w_memReadD), 
     .i_wdata(w_rs2_data),
-    .i_address(w_pc_val),
+    .i_instr_address(w_pc_val),
+    .i_data_address(w_alu_outE[13:0]),
     .o_instruction(w_instruction),
     .o_data(w_data_mem)
 );
 
+// Load program 
+initial begin
+    // Preload memory (optional: create `program.hex` file with 18-bit hex values)
+        $display("Trying to load program");
+        $readmemb("test2.mem", memory.memory);
+end
+
+
+integer i; 
+initial begin
+    for (i = 0; i < 10; i = i +1) begin
+        $display("Loaded memory with: %b", memory.memory[14'h2000+i]);
+    end
+end
+
+
 
 // second operand src register mux controlled by w_reg_srcD
+// Kind of realized this was redundant because it isn't used by LDR/STR
+/*
 wire [ADDRESS_WIDTH-1:0] w_rs2_addr; 
-
 mux2 #(ADDRESS_WIDTH) rs2_sel ( 
     .i_a(w_rs2),
     .i_b(2'b00), // Dummy register, contents won't be used by ALU
     .i_sel(w_reg_srcD),
     .o_out(w_rs2_addr)
-); 
+);
+*/ 
 
 // Register file
 reg_file reg_file(
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_rs1(w_rs1),
-    .i_rs2(w_rs2_addr),
+    .i_rs2(w_rs2),
     .i_rd(w_rd),
     .i_wdata(w_regWriteData),
     .i_wen(w_regWriteEnableD),
@@ -206,12 +228,21 @@ mux2  #(DATA_WIDTH) regWB_sel (
 
 
 // Selects new PC value 
-wire [PC_WIDTH-1:0] pc_plus1 = w_pc_val + 1'b1; // Go to next instruction (word-based)
+wire  [PC_WIDTH-1:0] pc_plus1; 
+assign pc_plus1 = (i_rst) ? 14'h2000 : (w_pc_val + 14'b1);
+
+
+wire signed [PC_WIDTH-1:0] w_branch_offset =  {{(PC_WIDTH-8){w_imm14[7]}}, w_imm14[7:0]}; // $signed allows for negative and positive branching offsets
+wire signed [PC_WIDTH-1:0] w_branch_target;
+assign w_branch_target =  w_pc_val + w_branch_offset;
+
 mux2  #(PC_WIDTH) pc_sel (
     .i_a(pc_plus1),
-    .i_b(w_alu_outE[13:0]),
+    .i_b(w_branch_target),
     .i_sel(w_branchTakenE),
     .o_out(w_next_pc)
 );
+
+
 
 endmodule

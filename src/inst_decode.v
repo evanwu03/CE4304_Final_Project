@@ -114,7 +114,7 @@ always @(*)
             o_memToReg = 1;
             o_memRead  = 1;
             o_alu_src  = 1;
-            o_regSrc   = 1;
+            o_regSrc   = 0;
             o_immSel   = `IMMSEL_I_TYPE;
             o_alu_op   = `ALU_ADD;
         end
@@ -123,7 +123,7 @@ always @(*)
         `STR: begin
             o_memWrite   = 1;
             o_alu_src    = 1;
-            o_regSrc     = 1;
+            o_regSrc     = 0;
             o_immSel     = `IMMSEL_I_TYPE;
             o_alu_op   = `ALU_ADD;
         end
@@ -148,7 +148,7 @@ always @(*)
          // Conditional branch
         `BNE: begin
             o_branch  = 1;
-            o_immSel  = `IMMSEL_J_TYPE;
+            o_immSel  = `IMMSEL_I_TYPE;
             o_alu_op   = `ALU_SUB;
         end
 
