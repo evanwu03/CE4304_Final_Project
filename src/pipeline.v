@@ -21,6 +21,10 @@
 // W - Writeback 
 
 
+/*  Full Implementation of 5 Stage pipeline */ 
+//  Built on single cycle implementation in datapath.v 
+
+
 `include "alu.v"
 `include "reg_file.v"
 `include "imm_extender.v"

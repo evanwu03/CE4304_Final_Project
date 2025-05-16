@@ -69,9 +69,7 @@ module cpu_tb2;
         $finish;
         // Run rest of program       
     end
-    
-    
-
+     
     initial
     begin
         // Required to dump signals to EPWave

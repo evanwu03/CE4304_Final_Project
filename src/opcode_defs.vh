@@ -43,8 +43,9 @@
 `define STR  4'b0101
 `define ADDI 4'b0110
 `define SUBI 4'b0111
-`define BNE 4'b1000
+
 // J-type Opcodes
+`define BNE 4'b1000
 `define JMP 4'b1001
 
 // Immediate Select Type 

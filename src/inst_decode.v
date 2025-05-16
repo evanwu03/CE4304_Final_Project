@@ -148,7 +148,9 @@ always @(*)
          // Conditional branch
         `BNE: begin
             o_branch  = 1;
-            o_immSel  = `IMMSEL_I_TYPE;
+            o_alu_src = 1; 
+            o_regSrc = 1; 
+            o_immSel  = `IMMSEL_J_TYPE;
             o_alu_op   = `ALU_SUB;
         end
 

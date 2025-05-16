@@ -39,8 +39,8 @@ module alu #(
   begin
 
     // Reset the flags
-    o_zero     <= 0;
-    o_negative <= 0;
+    //o_zero     <= 0;
+    //o_negative <= 0;
     // o_carry <= 0;
     // o_v     <= 0;
     case (i_ALUControlS)
