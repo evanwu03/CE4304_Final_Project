@@ -55,10 +55,12 @@ always @(posedge i_clk)
                         r_regs[i] <= 0;
                     end
             end
-        else if (i_wen) // if write is enabled, write data to destination register.
+        else if (i_wen) // if write is enabled and is not R0, write data to destination register.
             begin
                 r_regs[i_rd] <= i_wdata; 
                 $display("Wrote %d to R%d", i_wdata, i_rd);
             end
     end
+
+
 endmodule

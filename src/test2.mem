@@ -11,4 +11,4 @@
 @2005
 000000111000000010  // SUBS R0, R3, R2 sets zero flag
 @2006
-100011111111111101  // BNE  R3, R2 Loop while i != 11
+100011111111111101  // BNE Loop while i != 12

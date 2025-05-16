@@ -33,6 +33,8 @@
 `include "mux.v"
 `include "branch_unit.v"
 `include "pc.v"
+`include "pipeline_registers.v"
+
 
 module cpu #(
     parameter INSTRUCTION_WIDTH = 18,
@@ -112,18 +114,6 @@ pc pc(
     .o_pc_out(w_pc_val)
 );
 
-
-// second operand src register mux controlled by w_reg_srcD
-// Kind of realized this was redundant because it isn't used by LDR/STR
-/*
-wire [ADDRESS_WIDTH-1:0] w_rs2_addr; 
-mux2 #(ADDRESS_WIDTH) rs2_sel ( 
-    .i_a(w_rs2),
-    .i_b(2'b00), // Dummy register, contents won't be used by ALU
-    .i_sel(w_reg_srcD),
-    .o_out(w_rs2_addr)
-);
-*/ 
 
 // Register file
 reg_file reg_file(
