@@ -1,3 +1,3 @@
-This is an old project I did for my Computer Architecture class in undergrad where I designed a custom ISA for a CPU inspired by ARM and MIPS. The end goal was build a 5 stage pipeline, but only the single cycle version is fully completed.
+This is an old project I did for my Computer Architecture class in undergrad where I designed a custom ISA for a CPU inspired by ARM and MIPS. The end goal was to build a 5 stage pipeline, but only the single cycle version is fully completed.
 While I learned a lot about Computer Architecture from this project, I wrote it before knowing better code organization, testing, and SystemVerilog practices in general, so I do not intend to continue this project any further.
-Instead, this project will serve as a predecessor for my new ARM Out-of-Order CPU I'm designing at https://github.com/evanwu03/OutrO. Here, I will write the CPU with synthesis in mind with the final product being mapped to an FPGA. 
+Instead, this project will serve as a predecessor for my new ARM Out-of-Order CPU I'm designing at https://github.com/evanwu03/OutrO. Here, I will write the CPU with synthesis to an FPGA as the end goal.
